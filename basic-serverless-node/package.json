@@ -1,0 +1,19 @@
+{
+  "name": "basic-serverless-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "serverless offline --reloadHandler"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^4.1.20",
+    "serverless-offline": "^14.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.629.0"
+  }
+}

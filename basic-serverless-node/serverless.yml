@@ -1,0 +1,35 @@
+service: basic-serverless-node
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  memorySize: 128
+  timeout: 3
+
+functions:
+  index: #nome da função - nome que sobre pra AWS
+    handler: index.helloWorld
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+  sum: #nome da função - nome que sobre pra AWS
+    handler: index.sum
+    events:
+      - http:
+          path: /sum
+          method: get
+          cors: true
+  dynamo: #nome da função - nome que sobre pra AWS
+    handler: index.dynamo
+    events:
+      - http:
+          path: /dynamo/{valor}
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
