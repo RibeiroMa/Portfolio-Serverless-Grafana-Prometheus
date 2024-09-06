@@ -1,7 +1,7 @@
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
 const helloWorld = () => ({ message: "Hello World!" });
-exports.helloWorld = async function (event, context) {
+exports.helloWorld = async (event, context) => {
   const resposta = helloWorld();
   return {
     statusCode: 200,

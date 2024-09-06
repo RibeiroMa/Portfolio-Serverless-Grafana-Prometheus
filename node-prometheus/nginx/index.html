@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello</title>
+  </head>
+  <body>
+    <pre id="content"></pre>
+  </body>
+</html>
+
+<style>
+  body {
+    background-color: black;
+    color: white;
+  }
+</style>
+
+<script>
+  const body = document.querySelector("#content");
+
+  fetch("/api")
+    .then((res) => res.json())
+    .then((data) => {
+      body.innerText = JSON.stringify(data, null, 2);
+    });
+</script>

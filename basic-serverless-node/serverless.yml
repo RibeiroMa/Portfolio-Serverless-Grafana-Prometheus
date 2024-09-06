@@ -7,29 +7,104 @@ provider:
   region: ${opt:region, 'us-east-1'}
   memorySize: 128
   timeout: 3
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: "s3:ListBucket"
+          Resource: "*"
+
+        - Effect: Allow
+          Action:
+            - "s3:GetObject"
+            - "s3:PutObject"
+          Resource:
+            - "arn:aws:s3:::matheus-relatorios/*"
+
+        - Effect: Allow
+          Action: "sqs:SendMessage"
+          Resource:
+            - "arn:aws:sqs:us-east-1:477612276095:matheus-fila"
 
 functions:
-  index: #nome da função - nome que sobre pra AWS
+  index:
     handler: index.helloWorld
     events:
       - http:
           path: /
           method: get
           cors: true
-  sum: #nome da função - nome que sobre pra AWS
+  sum:
     handler: index.sum
     events:
       - http:
           path: /sum
           method: get
           cors: true
-  dynamo: #nome da função - nome que sobre pra AWS
+  dynamo:
     handler: index.dynamo
     events:
       - http:
           path: /dynamo/{valor}
           method: get
           cors: true
+  pedirRelatorio:
+    handler: reports.pedirRelatorio
+    events:
+      - http:
+          path: /pedir-relatorio
+          method: get
+          cors: true
+  processarRelatorio:
+    handler: reports.processarRelatorio
+    timeout: 15
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - MinhaFila
+              - Arn
+  listarRelatorios:
+    handler: reports.listarRelatorios
+    events:
+      - http:
+          path: /relatorios
+          method: get
+          cors: true
+  limparRelatorios:
+    handler: reports.limparRelatorios
+    events:
+      - http:
+          path: /limpar
+          method: get
+          cors: true
+      # - schedule: rate(5 minute)
+      - schedule: cron(0 6 * * 6)
+
+resources:
+  Resources:
+    MeuDynamo:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: AulaJp
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: "PAY_PER_REQUEST"
+        TimeToLiveSpecification:
+          AttributeName: "ttl"
+          Enabled: true
+    MeuBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: matheus-relatorios
+    MinhaFila:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: matheus-fila
 
 plugins:
   - serverless-offline

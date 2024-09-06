@@ -1,0 +1,57 @@
+services:
+  # https://github.com/grafana/grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - 3000:3000
+
+  # https://github.com/prometheus/prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    ports:
+      - 9090:9090
+
+  # https://github.com/nginx/nginx
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/index.html:/etc/nginx/html/index.html
+    ports:
+      - 8080:80
+
+  nginx-ubuntu:
+    build: /nginx
+    ports:
+      - 8081:80
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter
+    ports:
+      - 9113:9113
+    command:
+      - --nginx.scrape-uri=http://nginx/stub_status
+
+  # https://github.com/prometheus/node_exporter
+  node-exporter:
+    image: quay.io/prometheus/node-exporter
+    ports:
+      - 9100:9100
+
+  # https://github.com/prometheus/alertmanager
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+
+  # https://github.com/siimon/prom-client
+  app:
+    build: /app
+    ports:
+      - 4000:4000
